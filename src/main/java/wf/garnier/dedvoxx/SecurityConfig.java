@@ -33,8 +33,9 @@ public class SecurityConfig {
     ) throws Exception {
         http.getSharedObject(AuthenticationManagerBuilder.class)
                 .authenticationEventPublisher(publisher);
-        var manager = new ProviderManager (new RobotAuthenticationProvider(List.of("beep-boop", "boop-beep")));
-        manager.setAuthenticationEventPublisher(publisher);
+        var robotConfigurer = new RobotConfigurer()
+                .password("beep-boop")
+                .password("boop-boop");
         return http
                 .authenticationProvider(new DanielAuthenticationProvider())
                 .authorizeHttpRequests(auth -> {
@@ -45,7 +46,7 @@ public class SecurityConfig {
                 .formLogin(withDefaults())
                 .httpBasic(withDefaults())
                 .oauth2Login(withDefaults())
-                .addFilterBefore(new RobotFilter(manager), UsernamePasswordAuthenticationFilter.class)
+                .with(robotConfigurer, withDefaults())
                 .build();
     }
 

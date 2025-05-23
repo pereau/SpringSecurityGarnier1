@@ -31,11 +31,11 @@ public class RobotFilter extends OncePerRequestFilter {
         }
         String password = request.getHeader("x-robot-password");
         var token = RobotAuthentication.token(password);
-        var authentication = authenticationManager.authenticate(token)  ;
+        var authentication = authenticationManager.authenticate(token);
         if (authentication != null) {
-
+            return;
         }
-        if(password.equals("beep-boop")) {
+        if (password.equals("beep-boop")) {
 
             filterChain.doFilter(request, response);
         } else {
