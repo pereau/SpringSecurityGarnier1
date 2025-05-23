@@ -4,8 +4,8 @@ spring:
       client:
         registration:
           google:
-            client-id: "167559789167-vuljru314249foqfbjctf9hri6c90o8o.apps.googleusercontent.com"
-            client-secret: "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"
+            client-id: ""
+            client-secret: "GOCSPX-"
 logging:
   level:
     org.springframework.security: TRACE
