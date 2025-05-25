@@ -1,4 +1,4 @@
-package wf.garnier.dedvoxx;
+package wf.garnier.dedvoxx.robot;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

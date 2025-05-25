@@ -1,4 +1,4 @@
-package wf.garnier.dedvoxx;
+package wf.garnier.dedvoxx.robot;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -25,18 +25,20 @@ public class RobotFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        //0 Should we execute the filter ?
         if (!Collections.list(request.getHeaderNames()).contains("x-robot-password")) {
             filterChain.doFilter(request, response);
             return;
         }
+        //1 Do common tasks, logging, authentification etc
         String password = request.getHeader("x-robot-password");
-        var token = RobotAuthentication.token(password);
+        RobotAuthentication token = RobotAuthentication.token(password);
         var authentication = authenticationManager.authenticate(token);
+        //If already authenticate no verification
         if (authentication != null) {
             return;
         }
         if (password.equals("beep-boop")) {
-
             filterChain.doFilter(request, response);
         } else {
             response.setStatus(HttpStatus.FORBIDDEN.value());
@@ -45,6 +47,9 @@ public class RobotFilter extends OncePerRequestFilter {
         }
 
         System.out.println("Hello Robot");
+        SecurityContext newContext = SecurityContextHolder.createEmptyContext();
+        newContext.setAuthentication(new RobotAuthentication());
+        SecurityContextHolder.setContext(newContext);
         filterChain.doFilter(request, response);
 
     }

@@ -1,13 +1,14 @@
-package wf.garnier.dedvoxx;
+package wf.garnier.dedvoxx.robot;
 
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
+@NoArgsConstructor
 public class RobotAuthentication implements Authentication {
 
     private boolean authenticated;

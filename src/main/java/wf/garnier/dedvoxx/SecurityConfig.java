@@ -1,11 +1,9 @@
 package wf.garnier.dedvoxx;
 
-import ch.qos.logback.classic.spi.EventArgUtil;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -13,11 +11,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.util.Collections;
-import java.util.List;
+import wf.garnier.dedvoxx.robot.RobotConfigurer;
 
 import static java.util.Collections.EMPTY_LIST;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -31,12 +27,10 @@ public class SecurityConfig {
             HttpSecurity http,
             AuthenticationEventPublisher publisher
     ) throws Exception {
-        http.getSharedObject(AuthenticationManagerBuilder.class)
-                .authenticationEventPublisher(publisher);
-        var robotConfigurer = new RobotConfigurer()
-                .password("beep-boop")
-                .password("boop-boop");
-        return http
+//        http.getSharedObject(AuthenticationManagerBuilder.class)
+//                .authenticationEventPublisher(publisher);
+        DefaultSecurityFilterChain securityFilterChain =
+                http
                 .authenticationProvider(new DanielAuthenticationProvider())
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/private").authenticated();
@@ -44,10 +38,22 @@ public class SecurityConfig {
                 })
 //                .csrf(withDefaults())
                 .formLogin(withDefaults())
+//                .formLogin(configurer-> {
+//                    configurer
+//                            .loginPage("foo/bar")
+//                            .usernameParameter("utilisateur")
+//                            .passwordParameter("mot-de-passe");
+//                })
                 .httpBasic(withDefaults())
                 .oauth2Login(withDefaults())
-                .with(robotConfigurer, withDefaults())
+                .with(new RobotConfigurer()
+                        .password("beep-boop")
+                        .password("boop-boop"),
+                        withDefaults()
+                )
+//                              .headerName("x-robot-password")
                 .build();
+        return securityFilterChain;
     }
 
     @Bean

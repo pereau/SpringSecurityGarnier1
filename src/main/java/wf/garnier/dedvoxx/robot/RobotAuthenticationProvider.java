@@ -1,4 +1,4 @@
-package wf.garnier.dedvoxx;
+package wf.garnier.dedvoxx.robot;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
