@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -31,28 +30,32 @@ public class SecurityConfig {
 //                .authenticationEventPublisher(publisher);
         DefaultSecurityFilterChain securityFilterChain =
                 http
-                .authenticationProvider(new DanielAuthenticationProvider())
-                .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/private").authenticated();
-                    auth.anyRequest().permitAll();
-                })
+//                        .authenticationProvider(new DanielAuthenticationProvider())
+                        .authorizeHttpRequests(auth -> {
+                            auth.requestMatchers("/","/public","/favicon.svg","/css/*","/error").permitAll();
+                            auth.anyRequest().authenticated();
+                        })
 //                .csrf(withDefaults())
-                .formLogin(withDefaults())
+                        .formLogin(withDefaults())
 //                .formLogin(configurer-> {
 //                    configurer
 //                            .loginPage("foo/bar")
 //                            .usernameParameter("utilisateur")
 //                            .passwordParameter("mot-de-passe");
 //                })
-                .httpBasic(withDefaults())
-                .oauth2Login(withDefaults())
-                .with(new RobotConfigurer()
-                        .password("beep-boop")
-                        .password("boop-boop"),
-                        withDefaults()
-                )
+                        .httpBasic(withDefaults())
+                        .oauth2Login(
+                                configurer -> {
+                                    configurer.withObjectPostProcessor(new RateLimitPostProcessor());
+                                }
+                        )
+                        .with(new RobotConfigurer()
+                                        .password("beep-boop")
+                                        .password("boop-boop"),
+                                withDefaults()
+                        )
 //                              .headerName("x-robot-password")
-                .build();
+                        .build();
         return securityFilterChain;
     }
 
@@ -70,7 +73,7 @@ public class SecurityConfig {
             String userName = event.getAuthentication().getName();
             System.out.println("Login Successful "
                     + authClassName
-                    +" - "
+                    + " - "
                     + userName);
         });
     }
